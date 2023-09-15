@@ -109,7 +109,9 @@ NS_ASSUME_NONNULL_BEGIN
     MetalDepthProcessor *_modelQueue_depthProcessor;
     ProcessedFrame *_modelQueue_frame;
     float _modelQueue_maxDepth;
+    float _modelQueue_minDepth;
     BOOL _userSetMaxDepth;
+    BOOL _userSetMinDepth;
     BOOL _modelQueue_hasCalculatedModelConfig;
     BOOL _finalized;
     BOOL _wroteIntrinsicsToFile;
@@ -128,6 +130,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _modelQueue_maxDepth = _surfelFusionConfig.maxDepth;
         _userSetMaxDepth = NO;
+
+        _modelQueue_minDepth = _surfelFusionConfig.minDepth;
+        _userSetMinDepth = NO;
         
         std::shared_ptr<SurfelIndexMap> surfelIndexMap(new MetalSurfelIndexMap(device, commandQueue));
         _modelQueue_model = new PBFModel(surfelIndexMap);
@@ -233,6 +238,11 @@ NS_ASSUME_NONNULL_BEGIN
 {
     NSParameterAssert(minDepth >= 0);
     _surfelFusionConfig.minDepth = minDepth;
+    _userSetMinDepth = YES;
+}
+-(void)clearMinDepth
+{
+    _userSetMinDepth = NO;
 }
 
 - (float)maxDepth
@@ -325,6 +335,15 @@ NS_ASSUME_NONNULL_BEGIN
         // center weighting strategy
         maxDepth = kCenterDepthExpansionRatio * CVPixelBufferAverageDepthAroundCenter(depthBuffer);
     }
+
+    float minDepth;
+    if (_userSetMinDepth == YES) {
+        // respect users minDepth
+        minDepth = _surfelFusionConfig.minDepth;
+    } else {
+        // center weighting strategy
+        minDepth = kCenterDepthReductionRatio * CVPixelBufferAverageDepthAroundCenter(depthBuffer);
+    }
     
     _modelQueue_depthProcessor->computeFrameValues(frame, rawFrame, smoothPoints);
     
@@ -337,7 +356,7 @@ NS_ASSUME_NONNULL_BEGIN
     
     for (size_t i = 0; i < depthCount; ++i) {
         float depth = rawFrame.depths[i];
-        if (!isnan(depth) && depth < maxDepth) {
+        if (!isnan(depth) && depth < maxDepth && depth > minDepth) {
             Surfel surfel;
             surfel.position = toVector3f(frame.positions[i]);
             surfel.color = toVector3f(rawFrame.colors[i]);
@@ -358,6 +377,86 @@ NS_ASSUME_NONNULL_BEGIN
     pointCloud.depthFrameSize = toSimdFloat2(math::Vec2(rawFrame.width, rawFrame.height));
 
     return pointCloud;
+}
+
+- (float)getDistance:(CVPixelBufferRef)depthBuffer
+{
+    CVPixelBufferLockBaseAddress(depthBuffer, kCVPixelBufferLock_ReadOnly);
+
+    const size_t width = CVPixelBufferGetWidth(depthBuffer);
+    const size_t height = CVPixelBufferGetHeight(depthBuffer);
+    const size_t pixelCount = width * height;
+    const float *bufferValues = (const float *)CVPixelBufferGetBaseAddress(depthBuffer);
+
+    float minimum = 0;
+    const float ignorableDepth = 0.1; // Ignore depth less than 0.1 meters
+    for (size_t i = 0; i < pixelCount; ++i) {
+        size_t y = i / width;
+        size_t x = i % width;
+
+        float depth;
+
+        if (_flipsInputHorizontally) {
+            depth = bufferValues[(height - 1 - y) * width + x];
+        } else {
+            depth = bufferValues[i];
+        }
+
+        if (depth > ignorableDepth) {
+            if (minimum == 0) {
+                minimum = depth;
+            } else if (depth < minimum) {
+                minimum = depth;
+            }
+        }
+    }
+
+    CVPixelBufferUnlockBaseAddress(depthBuffer, kCVPixelBufferLock_ReadOnly);
+
+    return minimum;
+}
+
+//  .--------------------------------------------‧
+//  | ↑ Y                                        |
+//  | |                                          |
+//  | |                                          |
+//  | |                                          |
+//  | |                                          |
+//  | |                                          |
+//  | |                                          |
+//  | |                                          |
+//  | |                                       X  |
+//  | ●----------------------------------------→ |
+//  ‧--------------------------------------------‧
+//  The depth buffer image is rotated by 90 degrees and flipped horizontally
+//  The image dimensions are 320x180
+
+- (float)getDistanceTo:(CGPoint)point of:(CVPixelBufferRef)depthBuffer
+{
+    CVPixelBufferLockBaseAddress(depthBuffer, kCVPixelBufferLock_ReadOnly);
+
+    const size_t width = CVPixelBufferGetWidth(depthBuffer);
+    const size_t height = CVPixelBufferGetHeight(depthBuffer);
+    const float *bufferValues = (const float *)CVPixelBufferGetBaseAddress(depthBuffer);
+
+    const int x = point.x;
+    const int y = point.y;
+
+    float distance;
+
+    if (x < width && y < height) {
+        if (_flipsInputHorizontally) {
+            distance = bufferValues[(height - 1 - y) * width + x];
+        } else {
+            distance = bufferValues[y * width + x];
+        }
+    } else {
+        distance = 0;
+    }
+
+    CVPixelBufferUnlockBaseAddress(depthBuffer, kCVPixelBufferLock_ReadOnly);
+
+    return distance;
 }
 
 - (void)accumulateDepthBuffer:(CVPixelBufferRef)depthBuffer
@@ -464,7 +563,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 // MARK: - Internal
 
-static const float kCenterDepthExpansionRatio = 1.4;
+static const float kCenterDepthExpansionRatio = 1.5;
+static const float kCenterDepthReductionRatio = 0.7;
 
 + (NSString *)_loadAPIKeyFromInfoPlist
 {
@@ -637,14 +737,19 @@ static const float kCenterDepthExpansionRatio = 1.4;
     if (!isnan(averageDepthAtCenter) && _userSetMaxDepth == NO) {
         _surfelFusionConfig.maxDepth = averageDepthAtCenter * kCenterDepthExpansionRatio;
     }
+
+    if (!isnan(averageDepthAtCenter) && _userSetMinDepth == NO) {
+        _surfelFusionConfig.minDepth = averageDepthAtCenter * kCenterDepthReductionRatio;
+    }
     
     size_t frameWidth = _modelQueue_frame->rawFrame.width;
     size_t frameHeight = _modelQueue_frame->rawFrame.height;
     _pbfConfig.icpDownsampleFraction = 0.05 * 640.0 / (float)frameWidth * 360.0 / (float)frameHeight;
     
     _modelQueue_maxDepth = _surfelFusionConfig.maxDepth;
+    _modelQueue_minDepth = _surfelFusionConfig.minDepth;
     _modelQueue_hasCalculatedModelConfig = YES;
-    printf("Average depth at center was %f; set max depth to %f\n", averageDepthAtCenter, _surfelFusionConfig.maxDepth);
+    printf("Average depth at center was %f; set max depth to %f; set min depth to %f\n", averageDepthAtCenter, _surfelFusionConfig.maxDepth, _surfelFusionConfig.minDepth);
 }
 
 + (void)_fillFloatVector:(std::vector<float>&)vectorOut

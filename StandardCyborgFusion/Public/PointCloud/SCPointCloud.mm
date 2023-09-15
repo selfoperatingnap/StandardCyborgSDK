@@ -68,4 +68,63 @@
     return simd_make_float3(result.x(), result.y(), result.z());
 }
 
+- (simd_float3)nearest
+{
+    simd_float3 result = simd_make_float3(0, 0, 0);
+
+    NSInteger pointCount = [self pointCount];
+    Surfel *surfels = (Surfel *)[_pointsData bytes];
+
+    for (NSInteger i = 0; i < pointCount; ++i) {
+        Vector3f position = surfels[i].position;
+        if (result.z == 0) {
+            result = simd_make_float3(position.x(), position.y(), position.z());
+        } else {
+            if (position.z() < result.z) {
+                result = simd_make_float3(position.x(), position.y(), position.z());
+            }
+        }
+    }
+
+    return result;
+}
+
+- (simd_float3)furthest
+{
+    simd_float3 result = simd_make_float3(0, 0, 0);
+
+    NSInteger pointCount = [self pointCount];
+    Surfel *surfels = (Surfel *)[_pointsData bytes];
+
+    for (NSInteger i = 0; i < pointCount; ++i) {
+        Vector3f position = surfels[i].position;
+        if (result.z == 0) {
+            result = simd_make_float3(position.x(), position.y(), position.z());
+        } else {
+            if (position.z() > result.z) {
+                result = simd_make_float3(position.x(), position.y(), position.z());
+            }
+        }
+    }
+
+    return result;
+}
+
+- (NSArray<VectorWrapper *> *)points
+{
+    NSMutableArray<VectorWrapper *> *resultArray = [NSMutableArray array];
+
+    NSInteger pointCount = [self pointCount];
+    Surfel *surfels = (Surfel *)[_pointsData bytes];
+
+    for (NSInteger i = 0; i < pointCount; ++i) {
+        Vector3f position = surfels[i].position;
+        VectorWrapper *wrapper = [[VectorWrapper alloc] init];
+        wrapper.vector = simd_make_float3(position.x(), position.y(), position.z());
+        [resultArray addObject:wrapper];
+    }
+
+    return resultArray;
+}
+
 @end

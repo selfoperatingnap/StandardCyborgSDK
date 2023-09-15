@@ -233,6 +233,10 @@
 		76EE33DB212E131800D62C3D /* ScanningFinished.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 76EE33D7212E131800D62C3D /* ScanningFinished.m4a */; };
 		76FFDF122150559300500A84 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 76FFDF112150559300500A84 /* Settings.bundle */; };
 		8167FC94A2378AF9446C76A2 /* libPods-StandardCyborgAlgorithmsTestbed.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C1C0F66BDE5865F2607028FC /* libPods-StandardCyborgAlgorithmsTestbed.a */; };
+		848CBF062AAF69C200BCA580 /* VectorWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 848CBF052AAF69C200BCA580 /* VectorWrapper.m */; };
+		848CBF072AAF69D900BCA580 /* VectorWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 848CBF052AAF69C200BCA580 /* VectorWrapper.m */; };
+		849C70642AAF6BA000C3B2B5 /* VectorWrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 846587692AAF522E0077744C /* VectorWrapper.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		849C70652AAF6BA000C3B2B5 /* VectorWrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 846587692AAF522E0077744C /* VectorWrapper.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		88BA7AB739982588FB572F57 /* libPods-StandardCyborgFusion.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C5DA3002761C57C1A4A60A12 /* libPods-StandardCyborgFusion.a */; };
 		8EA73AA1833631D8B65ABC1F /* libPods-VisualTesterMac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1912A79DDFB763D1987EA793 /* libPods-VisualTesterMac.a */; };
 		A5092C3021C1BC50003B20BC /* crc32.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A5092C2E21C1BC50003B20BC /* crc32.cpp */; };
@@ -813,6 +817,8 @@
 		76EE33D7212E131800D62C3D /* ScanningFinished.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = ScanningFinished.m4a; sourceTree = "<group>"; };
 		76FFDF112150559300500A84 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		7DE545049E45E18955D27995 /* Pods-StandardCyborgFusionOSX.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StandardCyborgFusionOSX.release.xcconfig"; path = "Target Support Files/Pods-StandardCyborgFusionOSX/Pods-StandardCyborgFusionOSX.release.xcconfig"; sourceTree = "<group>"; };
+		846587692AAF522E0077744C /* VectorWrapper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VectorWrapper.h; sourceTree = "<group>"; };
+		848CBF052AAF69C200BCA580 /* VectorWrapper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VectorWrapper.m; sourceTree = "<group>"; };
 		927CBAD83870E97BE0537CAB /* Pods-StandardCyborgFusion.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StandardCyborgFusion.debug.xcconfig"; path = "Target Support Files/Pods-StandardCyborgFusion/Pods-StandardCyborgFusion.debug.xcconfig"; sourceTree = "<group>"; };
 		98E3CF7034A0504BCB87F3BF /* Pods-VisualTesteriOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VisualTesteriOS.debug.xcconfig"; path = "Target Support Files/Pods-VisualTesteriOS/Pods-VisualTesteriOS.debug.xcconfig"; sourceTree = "<group>"; };
 		A5092C2E21C1BC50003B20BC /* crc32.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = crc32.cpp; sourceTree = "<group>"; };
@@ -1171,6 +1177,8 @@
 				A5375B0421C86D18005B2BED /* SCPointCloud+Metal.m */,
 				A5375AFF21C86783005B2BED /* SCPointCloud+SceneKit.h */,
 				A5375B0021C86783005B2BED /* SCPointCloud+SceneKit.mm */,
+				846587692AAF522E0077744C /* VectorWrapper.h */,
+				848CBF052AAF69C200BCA580 /* VectorWrapper.m */,
 			);
 			path = PointCloud;
 			sourceTree = "<group>";
@@ -1566,6 +1574,7 @@
 				7632DC0D23BA84B000B67A7E /* SCScene.h in Headers */,
 				761FB7A1230759AC004E48F3 /* SceneKit+Mat3x3.h in Headers */,
 				A5A5A86F21C46843000978E9 /* SCReconstructionManagerParameters.h in Headers */,
+				849C70642AAF6BA000C3B2B5 /* VectorWrapper.h in Headers */,
 				767B495022CE47270005A060 /* SCLandmarking2D.h in Headers */,
 				761FB79E230759AC004E48F3 /* SceneKit+BoundingBox3.h in Headers */,
 				761FB7A4230759AC004E48F3 /* SceneKit+Polyline.h in Headers */,
@@ -1675,6 +1684,7 @@
 				E8EB321B24739C8C00EF7A01 /* MetalComputeEngine.h in Headers */,
 				E8EB321C24739C8C00EF7A01 /* SCMesh.h in Headers */,
 				E8EB321D24739C8C00EF7A01 /* ThreadPool.hpp in Headers */,
+				849C70652AAF6BA000C3B2B5 /* VectorWrapper.h in Headers */,
 				E8EB321F24739C8C00EF7A01 /* GravityEstimator.hpp in Headers */,
 				E8EB322024739C8C00EF7A01 /* SurfelFusion.hpp in Headers */,
 				E8EB322124739C8C00EF7A01 /* KDTreeAdaptor.hpp in Headers */,
@@ -2330,6 +2340,7 @@
 				768967F92395DC3B007179B2 /* SCEarTracking.m in Sources */,
 				76A3438E219A4AE9008DEEFA /* MathHelpers.m in Sources */,
 				7627988E2112D6E600BD436E /* MetalComputeEngine.mm in Sources */,
+				848CBF062AAF69C200BCA580 /* VectorWrapper.m in Sources */,
 				768F1BE52310BA6300DF02D3 /* SceneKit+StandardCyborgNode.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2504,6 +2515,7 @@
 				E8EB32A224739C8C00EF7A01 /* MathHelpers.m in Sources */,
 				E8EB32A324739C8C00EF7A01 /* MetalComputeEngine.mm in Sources */,
 				E8EB32A524739C8C00EF7A01 /* SceneKit+StandardCyborgNode.mm in Sources */,
+				848CBF072AAF69D900BCA580 /* VectorWrapper.m in Sources */,
 				07278A1724EC6C8100564C56 /* MeshUvMap.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3040,7 +3052,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = FZU7U4ED2K;
+				DEVELOPMENT_TEAM = WJ9X7DSM95;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/StandardCyborgFusion",
@@ -3056,7 +3068,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 2.4;
-				PRODUCT_BUNDLE_IDENTIFIER = com.standardcyborg.TrueDepthFusion;
+				PRODUCT_BUNDLE_IDENTIFIER = com.stripe.test;
 				PRODUCT_NAME = TrueDepthFusion;
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "TrueDepthFusion/TrueDepthFusion-Bridging-Header.h";
@@ -3072,7 +3084,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = FZU7U4ED2K;
+				DEVELOPMENT_TEAM = WJ9X7DSM95;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/StandardCyborgFusion",
@@ -3088,7 +3100,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 2.4;
-				PRODUCT_BUNDLE_IDENTIFIER = com.standardcyborg.TrueDepthFusion;
+				PRODUCT_BUNDLE_IDENTIFIER = com.stripe.test;
 				PRODUCT_NAME = TrueDepthFusion;
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "TrueDepthFusion/TrueDepthFusion-Bridging-Header.h";

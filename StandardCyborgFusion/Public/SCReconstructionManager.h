@@ -77,6 +77,13 @@ typedef struct {
                            withCalibrationData:(AVCameraCalibrationData *)calibrationData
                                smoothingPoints:(BOOL)smoothPoints;
 
+/** Calculate the nearest distance of the 3D scan from the camera along the z-axis */
+- (float)getDistance:(CVPixelBufferRef)depthBuffer;
+
+/** Calculate the distance between the camera and a specific point in the 3D scan along the z-axis */
+- (float)getDistanceTo:(CGPoint)point
+                    of:(CVPixelBufferRef)depthBuffer;
+
 /** Pass in synchronized color and depth buffers as fast as they are made available by the system.
  Automatically drops frames if more are accumulated than can be processed in real time. */
 - (void)accumulateDepthBuffer:(CVPixelBufferRef)depthBuffer
@@ -93,6 +100,12 @@ NS_SWIFT_NAME(accumulate(depthBuffer:colorBuffer:calibrationData:));
 /** Resets the state of reconstruction, such as for another reconstruction attempt.
  Must call -finalize: first. */
 - (void)reset;
+
+/** Sets a manual clipping distance in meters. */
+- (void)setMinDepth:(float)minDepth;
+
+/** Resets manual clipping distance back to center-weighted strategy */
+- (void)clearMinDepth;
 
 /** Sets a manual clipping distance in meters. */
 - (void)setMaxDepth:(float)maxDepth;

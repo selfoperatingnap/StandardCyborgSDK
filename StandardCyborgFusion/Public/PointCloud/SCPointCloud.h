@@ -7,6 +7,7 @@
 
 #import <Foundation/Foundation.h>
 #import <simd/simd.h>
+#import "VectorWrapper.h"
 
 @interface SCPointCloud : NSObject
 
@@ -44,6 +45,10 @@
 
 /** Computes the geometric mean of this point cloud */
 - (simd_float3)centerOfMass;
+- (simd_float3)nearest;
+- (simd_float3)furthest;
+
+- (NSArray<VectorWrapper *> *)points;
 
 - (instancetype)init NS_UNAVAILABLE;
 
