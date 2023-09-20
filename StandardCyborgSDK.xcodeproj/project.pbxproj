@@ -3068,7 +3068,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 2.4;
-				PRODUCT_BUNDLE_IDENTIFIER = com.stripe.test;
+				PRODUCT_BUNDLE_IDENTIFIER = com.standardcyborg.TrueDepthFusion;
 				PRODUCT_NAME = TrueDepthFusion;
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "TrueDepthFusion/TrueDepthFusion-Bridging-Header.h";
@@ -3100,7 +3100,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 2.4;
-				PRODUCT_BUNDLE_IDENTIFIER = com.stripe.test;
+				PRODUCT_BUNDLE_IDENTIFIER = com.standardcyborg.TrueDepthFusion;
 				PRODUCT_NAME = TrueDepthFusion;
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "TrueDepthFusion/TrueDepthFusion-Bridging-Header.h";

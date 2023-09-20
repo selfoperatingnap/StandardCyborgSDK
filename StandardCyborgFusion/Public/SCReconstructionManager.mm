@@ -628,8 +628,10 @@ static const float kCenterDepthReductionRatio = 0.7;
                     // Intentional fall-through
                     
                 case SCAssimilatedFrameResultFailed:
-                    _inputQueue_stopped = YES;
-                    _inputQueue_incomingFrameData = nil;
+                    // NOTE: Ignore lost focus and continue scanning
+
+                    // _inputQueue_stopped = YES;
+                    // _inputQueue_incomingFrameData = nil;
                     break;
             }
             
