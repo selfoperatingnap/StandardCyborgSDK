@@ -70,14 +70,10 @@ const Surfels& PBFModel::getCoreSurfels(unsigned int minPts, float eps)
         for (int index: corePointIndexes) {
             _coreSurfels.push_back(_surfels[index]);
         }
-#ifndef XCODE_ACTION_install // Avoid logging in archive builds
         printf("Extracted core surfels: %zu/%zu\n", corePointIndexes.size(), points.size());
-#endif
         return _coreSurfels;
     } else {
-#ifndef XCODE_ACTION_install // Avoid logging in archive builds
-        printf("Failed to Extracted core surfels\n");
-#endif
+        printf("Failed to extract core surfels\n");
         return _surfels;
     }
 }
