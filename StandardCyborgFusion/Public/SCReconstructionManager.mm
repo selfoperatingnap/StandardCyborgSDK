@@ -523,16 +523,24 @@ NS_ASSUME_NONNULL_BEGIN
     });
 }
 
+- (void)configureNoiseReduction:(int)minPoints epsilon:(float)epsilon
+{
+    _noiseReductionConfiguration.minPoints = minPoints;
+    _noiseReductionConfiguration.epsilon = epsilon;
+}
+
 - (SCPointCloud *)buildPointCloud
 {
     // TODO: Fix threading/queuing and run off of a copy in PBFModel
-    const Surfels& surfels = _modelQueue_model->getSurfels();
     NSData *surfelData;
     if (_finalized) {
+        const Surfels& surfels = _modelQueue_model->getCoreSurfels(_noiseReductionConfiguration.minPoints,
+                                                                   _noiseReductionConfiguration.epsilon);
         surfelData = [NSData dataWithBytes:(void *)surfels.data() length:surfels.size() * sizeof(Surfel)];
     } else {
         // While scanning, for the sake of performance, avoid copying the whole surfels data structure and return it directly
         // This is an obvious thread safety issue, but we tend to get away with it 99+% of the time, so it's acceptable for now
+        const Surfels& surfels = _modelQueue_model->getSurfels();
         surfelData = [NSData dataWithBytesNoCopy:(void *)surfels.data() length:surfels.size() * sizeof(Surfel) freeWhenDone:NO];
     }
     

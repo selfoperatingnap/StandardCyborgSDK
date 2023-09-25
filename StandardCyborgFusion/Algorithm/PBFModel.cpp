@@ -16,6 +16,7 @@
 #include <iostream>
 #include "crc32.hpp"
 #include <StandardCyborgFusion/PBFDefinitions.h>
+#include <StandardCyborgFusion/DBSCAN.hpp>
 #include <standard_cyborg/util/DataUtils.hpp>
 #include <cmath>
 
@@ -45,6 +46,40 @@ PBFModel::~PBFModel() {}
 const Surfels& PBFModel::getSurfels() const
 {
     return _surfels;
+}
+
+const Surfels& PBFModel::getCoreSurfels(unsigned int minPts, float eps)
+{
+    _coreSurfels.clear();
+    size_t surfelCount = _surfels.size();
+    
+    vector<Point3D> points(surfelCount);
+    for (int i = 0; i < surfelCount; i++) {
+        points[i].x = _surfels[i].position[0];
+        points[i].y = _surfels[i].position[1];
+        points[i].z = _surfels[i].position[2];
+        points[i].clusterID = UNCLASSIFIED;
+    }
+
+    DBSCAN dbscan = DBSCAN(minPts, eps, points);
+    dbscan.run();
+
+    vector<int> corePointIndexes = dbscan.getCorePointIndexes();
+
+    if (corePointIndexes.size() > 0) {
+        for (int index: corePointIndexes) {
+            _coreSurfels.push_back(_surfels[index]);
+        }
+#ifndef XCODE_ACTION_install // Avoid logging in archive builds
+        printf("Extracted core surfels: %zu/%zu\n", corePointIndexes.size(), points.size());
+#endif
+        return _coreSurfels;
+    } else {
+#ifndef XCODE_ACTION_install // Avoid logging in archive builds
+        printf("Failed to Extracted core surfels\n");
+#endif
+        return _surfels;
+    }
 }
 
 const std::vector<uint32_t>& PBFModel::getSurfelIndexMap() const
@@ -334,6 +369,7 @@ void PBFModel::reset(unsigned int randomSeed)
     _surfelLandmarksIndex.removeAllHits();
     
     _surfels.clear();
+    _coreSurfels.clear();
     _assimilatedFrameMetadatas.clear();
     _ICPTargetCloud = nullptr;
 }

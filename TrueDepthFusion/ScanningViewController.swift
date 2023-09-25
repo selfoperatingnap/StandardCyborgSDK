@@ -91,6 +91,7 @@ class ScanningViewController: UIViewController, CameraManagerDelegate, SCReconst
         
         _cameraManager.delegate = self
         _cameraManager.configureCaptureSession(maxColorResolution: 1920, maxDepthResolution: _useFullResolutionDepthFrames ? 640 : 320, maxFramerate: 30)
+        _reconstructionManager.configureNoiseReduction(minPoints: 10, epsilon: 0.005)
         _reconstructionManager.delegate = self
         _reconstructionManager.includesColorBuffersInMetadata = true
         

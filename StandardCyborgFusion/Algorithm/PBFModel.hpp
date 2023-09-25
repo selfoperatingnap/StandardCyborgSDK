@@ -29,6 +29,11 @@
 
 using namespace standard_cyborg;
 
+typedef struct {
+    int minPoints;
+    float epsilon;
+} NoiseReductionConfiguration;
+
 class PBFModel {
 public:
     PBFModel(std::shared_ptr<SurfelIndexMap> surfelIndexMap, unsigned int randomSeed = 0);
@@ -50,6 +55,7 @@ public:
     std::shared_ptr<sc3d::Geometry> buildPointCloud(float downsampledFraction = 1.0f);
     Eigen::Matrix4f getCurrentExtrinsicMatrix();
     const Surfels& getSurfels() const;
+    const Surfels& getCoreSurfels(unsigned int minPts, float eps);
     const std::vector<uint32_t>& getSurfelIndexMap() const;
     const SparseSurfelLandmarksIndex& getSurfelLandmarksIndex() const;
     const std::vector<PBFAssimilatedFrameMetadata> getAssimilatedFrameMetadata() const;
@@ -60,6 +66,7 @@ private:
     FastRand _fastRNG;
 
     Surfels _surfels;
+    Surfels _coreSurfels;
     std::shared_ptr<sc3d::Geometry> _ICPTargetCloud;
     
     SparseSurfelLandmarksIndex _surfelLandmarksIndex;

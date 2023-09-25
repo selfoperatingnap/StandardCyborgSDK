@@ -33,6 +33,11 @@ typedef struct {
     NSInteger droppedFrameCount;
 } SCReconstructionManagerStatistics;
 
+typedef struct {
+    int minPoints;
+    float epsilon;
+} SCNoiseReductionConfiguration;
+
 /**
  Performs 3D reconstruction by assimilating color, depth, and IMU data.
  All calls are threadsafe.
@@ -59,6 +64,8 @@ typedef struct {
 
 /** When non-empty, clips the reconstruction region of incoming depth buffers and frames to this position and size, each normalized from [0..1] */
 @property (nonatomic) CGRect normalizedFrameClipRegion;
+
+@property (nonatomic) SCNoiseReductionConfiguration noiseReductionConfiguration;
 
 /** The camera calibration data used by the most recently passed depth frame. */
 @property (nonatomic, readonly) AVCameraCalibrationData *latestCameraCalibrationData;
@@ -112,6 +119,11 @@ NS_SWIFT_NAME(accumulate(depthBuffer:colorBuffer:calibrationData:));
 
 /** Resets manual clipping distance back to center-weighted strategy */
 - (void)clearMaxDepth;
+
+/** Set the `minPoints` and `epsilon` parameters of DBSCAN algorithm  */
+- (void)configureNoiseReduction:(int)minPoints
+                        epsilon:(float)epsilon
+NS_SWIFT_NAME(configureNoiseReduction(minPoints:epsilon:));
 
 /** May be called at any point during or after scanning to build a copy of the currently reconstructed point cloud */
 - (SCPointCloud *)buildPointCloud;
