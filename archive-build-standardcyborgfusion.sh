@@ -32,9 +32,6 @@ sed -i '' -E "s/  s.version(.+) = '([0-9\.]+)'/  s.version\1 = '$new_version'/g"
 
 echo
 echo
-echo "Building StandardCyborgFusion for macOS"
-echo
-xcodebuild archive -workspace StandardCyborgSDK.xcworkspace -scheme StandardCyborgFusionOSX -configuration Release -sdk macosx -archivePath build/StandardCyborgFusion-osx | xcpretty
 
 echo
 echo "Building StandardCyborgFusion for iOS"
@@ -52,15 +49,10 @@ echo
 echo "Creating universal binary for device and simulator architectures..."
 pushd "build" &>/dev/null
   # Create the directories
-  mkdir -p osx ios
+  mkdir -p ios
 
   # Remove existing
   if test -d "ios/StandardCyborgFusion.framework"; then rm -r "ios/StandardCyborgFusion.framework"; fi
-  if test -d "osx/StandardCyborgFusion.framework"; then rm -r "osx/StandardCyborgFusion.framework"; fi
-
-  # Copy build products into the appropriate locations
-  osx_root="StandardCyborgFusion-osx.xcarchive/Products/Library/Frameworks/"
-  cp -R "$osx_root/StandardCyborgFusion.framework/" "osx/StandardCyborgFusion.framework"
 
   ios_root="StandardCyborgFusion-ios.xcarchive/Products/Library/Frameworks/"
   cp -R "$ios_root/StandardCyborgFusion.framework" "ios/StandardCyborgFusion.framework"
@@ -68,20 +60,12 @@ pushd "build" &>/dev/null
   sim_root="StandardCyborgFusion-simulator.xcarchive/Products/Library/Frameworks/"
 
   # Ensure private headers are stripped
-  if test -d "osx/StandardCyborgFusion.framework/Versions/A/PrivateHeaders"; then
-    echo "ERROR: private headers were not stripped from the built Mac framework!"
-    exit
-  fi
   if test -d "ios/StandardCyborgFusion.framework/PrivateHeaders"; then
     echo "ERROR: private headers were not stripped from the built iOS framework!"
     exit
   fi
 
   # Ensure ML models are not published
-  if compgen -G "osx/StandardCyborgFusion.framework/Versions/A/Resources/*.mlmodel*" >/dev/null; then
-    echo "ERROR: mlmodelc directories were not stripped from the built Mac framework!"
-    exit
-  fi
   if compgen -G "ios/StandardCyborgFusion.framework/*.mlmodel*" >/dev/null; then
     echo "ERROR: mlmodelc directories were not stripped from the built iOS framework!"
     exit
@@ -95,7 +79,6 @@ pushd "build" &>/dev/null
   xcrun xcodebuild -create-xcframework \
     -framework "$ios_root/StandardCyborgFusion.framework" \
     -framework "$sim_root/StandardCyborgFusion.framework" \
-    -framework "$osx_root/StandardCyborgFusion.framework" \
     -output "StandardCyborgFusion.xcframework"
 
   # Copy files into StandardCyborgCocoa
