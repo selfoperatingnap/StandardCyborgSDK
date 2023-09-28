@@ -7,6 +7,7 @@
 //
 
 #include "DBSCAN.hpp"
+#include "Cluster.hpp"
 #include <map>
 #include <string>
 
@@ -106,17 +107,45 @@ vector<int> DBSCAN::getCorePointIndexes()
         }
     }
 
-    if (groupedPointIndexes.size() != 0) {
-        string key;
-        size_t size = 0;
-        // Iterate through the map and get the group with largest size
+    if (groupedPointIndexes.size() > 0) {
+        vector<Cluster> clusters;
         for (const auto& pair : groupedPointIndexes) {
-            if (pair.second.size() > size) {
-                key = pair.first;
-                size = pair.second.size();
-            }
+            Cluster cluster;
+            cluster.indexes = pair.second;
+            cluster.centerPoint.x = 0;
+            cluster.centerPoint.y = 0;
+            cluster.centerPoint.z = 0;
+            for (int index: pair.second)
+                {
+                cluster.centerPoint.x += m_points[index].x;
+                cluster.centerPoint.y += m_points[index].y;
+                cluster.centerPoint.z += m_points[index].z;
+                }
+            
+            cluster.centerPoint.x /= pair.second.size();
+            cluster.centerPoint.y /= pair.second.size();
+            cluster.centerPoint.z /= pair.second.size();
+
+            clusters.push_back(cluster);
         }
-        return groupedPointIndexes[key];
+
+        // Sort by number of points
+        std::sort(clusters.begin(), clusters.end(), compareBySize);
+        
+        vector<Cluster> largeClusters;
+        // Get the first 3 items of clusters sorted by number of points
+        for (int i = 0; i < 3 && i < clusters.size(); ++i) {
+            largeClusters.push_back(clusters[i]);
+        }
+        
+        // Sort by depth of center point
+        std::sort(largeClusters.begin(), largeClusters.end(), compareByDistance);
+
+        Cluster coreCluster = largeClusters[0];
+        printf("Center Point: (%.3lf, %.3lf, %.3lf)\n",
+               coreCluster.centerPoint.x, coreCluster.centerPoint.y, coreCluster.centerPoint.z);
+
+        return coreCluster.indexes;
     } else {
         return vector<int>();
     }
