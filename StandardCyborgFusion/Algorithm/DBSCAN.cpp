@@ -135,7 +135,11 @@ vector<int> DBSCAN::getCorePointIndexes()
         vector<Cluster> largeClusters;
         // Get the first 3 items of clusters sorted by number of points
         for (int i = 0; i < 3 && i < clusters.size(); ++i) {
-            largeClusters.push_back(clusters[i]);
+            // Ignore clusters that are too small
+            bool shouldIgnore = (i != 0) && (clusters[i].indexes.size() > clusters[0].indexes.size() / 5);
+            if (!shouldIgnore) {
+                largeClusters.push_back(clusters[i]);
+            }
         }
         
         // Sort by depth of center point
