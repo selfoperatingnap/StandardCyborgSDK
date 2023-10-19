@@ -17,15 +17,44 @@ using namespace standard_cyborg;
 
 struct Cluster {
     vector<int> indexes;
-    math::Vec3 centerPoint;
+    vector<math::Vec3> pointsAroundCenter;
 };
 
 bool compareBySize(const Cluster& a, const Cluster& b) {
     return a.indexes.size() > b.indexes.size();
 }
 
-bool compareByDistance(const Cluster& a, const Cluster& b) {
-    return pow(a.centerPoint.x, 2) + pow(a.centerPoint.y, 2) + pow(a.centerPoint.z, 2) < pow(b.centerPoint.x, 2) + pow(b.centerPoint.y, 2) + pow(b.centerPoint.z, 2);
+bool compareBySizeOfPointsAroundCenter(const Cluster& a, const Cluster& b) {
+    return a.pointsAroundCenter.size() > b.pointsAroundCenter.size();
+}
+
+bool compareByDepth(const Cluster& a, const Cluster& b) {
+    if (a.pointsAroundCenter.empty()) {
+        return false;
+    }
+    if (b.pointsAroundCenter.empty()) {
+        return true;
+    }
+
+    // Compare the average depth of up to 10 points closest to the center.
+    float averageDepthOfCenterPointsA = 0;
+    float averageDepthOfCenterPointsB = 0;
+
+    int countA = 0;
+    for (int i = 0; i < a.pointsAroundCenter.size() && i < 10; i++) {
+        countA++;
+        averageDepthOfCenterPointsA += a.pointsAroundCenter.at(i).z;
+    }
+    averageDepthOfCenterPointsA /= countA;
+
+    int countB = 0;
+    for (int i = 0; i < b.pointsAroundCenter.size() && i < 10; i++) {
+        countB++;
+        averageDepthOfCenterPointsB += b.pointsAroundCenter.at(i).z;
+    }
+    averageDepthOfCenterPointsB /= countB;
+
+    return averageDepthOfCenterPointsA < averageDepthOfCenterPointsB;
 }
 
 #endif /* Cluster_hpp */

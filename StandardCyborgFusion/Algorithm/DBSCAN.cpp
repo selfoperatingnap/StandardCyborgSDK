@@ -112,19 +112,14 @@ vector<int> DBSCAN::getCorePointIndexes()
         for (const auto& pair : groupedPointIndexes) {
             Cluster cluster;
             cluster.indexes = pair.second;
-            cluster.centerPoint.x = 0;
-            cluster.centerPoint.y = 0;
-            cluster.centerPoint.z = 0;
-            for (int index: pair.second)
-                {
-                cluster.centerPoint.x += m_points[index].x;
-                cluster.centerPoint.y += m_points[index].y;
-                cluster.centerPoint.z += m_points[index].z;
+
+            // Get points around the center within 15cm radius
+            for (int index: pair.second) {
+                Point3D point = m_points[index];
+                if (sqrt(pow(point.x, 2) + pow(point.y, 2)) < 0.15) {
+                    cluster.pointsAroundCenter.push_back(math::Vec3(point.x, point.y, point.z));
                 }
-            
-            cluster.centerPoint.x /= pair.second.size();
-            cluster.centerPoint.y /= pair.second.size();
-            cluster.centerPoint.z /= pair.second.size();
+            }
 
             clusters.push_back(cluster);
         }
@@ -133,21 +128,21 @@ vector<int> DBSCAN::getCorePointIndexes()
         std::sort(clusters.begin(), clusters.end(), compareBySize);
         
         vector<Cluster> largeClusters;
-        // Get the first 3 items of clusters sorted by number of points
-        for (int i = 0; i < 3 && i < clusters.size(); ++i) {
-            // Ignore clusters that are too small
-            bool shouldIgnore = (i != 0) && (clusters[i].indexes.size() > clusters[0].indexes.size() / 5);
-            if (!shouldIgnore) {
-                largeClusters.push_back(clusters[i]);
-            }
+        // Get the first upto 5 clusters
+        for (int i = 0; i < 5 && i < clusters.size(); ++i) {
+            largeClusters.push_back(clusters[i]);
         }
-        
-        // Sort by depth of center point
-        std::sort(largeClusters.begin(), largeClusters.end(), compareByDistance);
+
+        // Sort by the average depth of points around the center
+        std::sort(largeClusters.begin(), largeClusters.end(), compareByDepth);
+
+        // std::sort(largeClusters.begin(), largeClusters.end(), compareBySizeOfPointsAroundCenter);
 
         Cluster coreCluster = largeClusters[0];
-        printf("Center Point: (%.3lf, %.3lf, %.3lf)\n",
-               coreCluster.centerPoint.x, coreCluster.centerPoint.y, coreCluster.centerPoint.z);
+        for (int index: coreCluster.indexes) {
+            printf("Core Cluster Point: (%.3lf, %.3lf, %.3lf)\n",
+                   m_points[index].x, m_points[index].y, m_points[index].z);
+        }
 
         return coreCluster.indexes;
     } else {
