@@ -110,13 +110,16 @@ vector<int> DBSCAN::getCorePointIndexes()
     if (groupedPointIndexes.size() > 0) {
         vector<Cluster> clusters;
         for (const auto& pair : groupedPointIndexes) {
+            // Ignore clusters with a count less than 20% of the total number of points
+            if (pair.second.size() < m_points.size() * 0.2) { continue; }
+
             Cluster cluster;
             cluster.indexes = pair.second;
 
-            // Get points around the center within 15cm radius
+            // Get points around the center within 0.1m radius
             for (int index: pair.second) {
                 Point3D point = m_points[index];
-                if (sqrt(pow(point.x, 2) + pow(point.y, 2)) < 0.15) {
+                if (sqrt(pow(point.x, 2) + pow(point.y, 2)) < 0.10) {
                     cluster.pointsAroundCenter.push_back(math::Vec3(point.x, point.y, point.z));
                 }
             }
@@ -139,10 +142,12 @@ vector<int> DBSCAN::getCorePointIndexes()
         // std::sort(largeClusters.begin(), largeClusters.end(), compareBySizeOfPointsAroundCenter);
 
         Cluster coreCluster = largeClusters[0];
+        /*
         for (int index: coreCluster.indexes) {
             printf("Core Cluster Point: (%.3lf, %.3lf, %.3lf)\n",
                    m_points[index].x, m_points[index].y, m_points[index].z);
         }
+         */
 
         return coreCluster.indexes;
     } else {
